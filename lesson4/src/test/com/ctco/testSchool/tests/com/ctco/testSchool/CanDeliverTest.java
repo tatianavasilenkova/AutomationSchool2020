@@ -1,4 +1,4 @@
-package com.ctco.testSchool.tests;
+package com.ctco.testSchool;
 
 import static com.ctco.testSchool.Member.type.DEV;
 import static com.ctco.testSchool.Member.type.TEST;

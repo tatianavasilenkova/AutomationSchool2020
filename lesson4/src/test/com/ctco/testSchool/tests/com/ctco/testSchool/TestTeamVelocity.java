@@ -1,4 +1,4 @@
-package com.ctco.testSchool.tests;
+package com.ctco.testSchool;
 
 import com.ctco.testSchool.Member;
 import com.ctco.testSchool.Team;

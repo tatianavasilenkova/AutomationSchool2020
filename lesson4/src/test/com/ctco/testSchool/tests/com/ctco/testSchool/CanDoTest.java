@@ -1,4 +1,4 @@
-package com.ctco.testSchool.tests;
+package com.ctco.testSchool;
 
 import java.util.Arrays;
 import java.util.List;
