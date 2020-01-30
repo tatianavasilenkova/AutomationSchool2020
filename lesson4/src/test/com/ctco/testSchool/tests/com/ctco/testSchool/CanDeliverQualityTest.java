@@ -11,8 +11,9 @@ import org.junit.Test;
 public class CanDeliverQualityTest {
 
     /**
-     * - Happy Path: team can deliver stories. 1 tester and 2 devs work in parallel, which give tester a time to finish testing in time
-     * - Negative case: team can not deliver stories. with one tester in team and 2 devs work in parallel
+     * Black-box tests:
+     * - Happy Path: team can deliver stories. 1 tester and 2 devs work in parallel, which give tester a time to finish testing in time;
+     * - Negative case: team can not deliver stories. with one tester in team and 2 devs work in parallel;
      * - Happy Path: team can deliver same stories from previous test but with two testers in team and 2 devs work in parallel. It's a border case
      */
 
