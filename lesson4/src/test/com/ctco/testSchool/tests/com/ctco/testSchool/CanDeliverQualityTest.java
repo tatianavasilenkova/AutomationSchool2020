@@ -106,7 +106,7 @@ public class CanDeliverQualityTest {
     @Test
     public void teamCanDeliverQualityWithTwoTesters() {
             /* - team can deliver same stories from previous test but with two testers in team and 2 devs work in parallel. It's a border case
-               - team = dev1 + dev2 + test1
+               - team = dev1 + dev2 + test1 + tester2
                - story1(Dev/Test) = 6/3
                - story2(dev/Test) = 1/1
                - story3(dev/test) = 6/2
@@ -155,8 +155,112 @@ public class CanDeliverQualityTest {
         Assert.assertTrue("Team can deliver all stories in time with two testers", team.canDeliverQuality());
     }
 
+    @Test
+    public void teamCanNotDeliverQualityWithTestersZeroVelocity() {
+            /* - team can not deliver stories if testers velocity = 0 and dev's not
+               - team = dev1 + dev2 + test1 + test2
+               - story1(Dev/Test) = 6/3
+               - story2(dev/Test) = 1/1
+               - story3(dev/test) = 6/2
+               - story4(dev/test) = 1/1
+             */
+        Team team = new Team();
+
+        // Set sprint days
+        team.sprintDays = 10;
+
+        // Add Team members and add velocity
+        Member developerOne = new Member(DEV);
+        team.addMember(developerOne);
+        developerOne.velocity = 1;
+
+        Member developerTwo = new Member(DEV);
+        team.addMember(developerOne);
+        developerTwo.velocity = 1;
+
+        Member testerOne = new Member(TEST);
+        team.addMember(testerOne);
+        testerOne.velocity = 0;
+
+        Member testerTwo = new Member(TEST);
+        team.addMember(testerTwo);
+        testerTwo.velocity = 0;
+
+        // set story points for Devs and Testers. Put stories into sprint backlog
+        Story storyOne = new Story();
+        storyOne.setStoryPoints(6);
+        storyOne.setTestPoints(3);
+
+        Story storyTwo = new Story();
+        storyTwo.setStoryPoints(1);
+        storyTwo.setTestPoints(1);
+
+        Story storyThree = new Story();
+        storyThree.setStoryPoints(6);
+        storyThree.setTestPoints(2);
+
+        Story storyFour = new Story();
+        storyFour.setStoryPoints(1);
+        storyFour.setTestPoints(1);
+
+        team.backlog = Arrays.asList(storyOne, storyTwo);
+        Assert.assertFalse("Team can deliver all stories in time with two testers velocity=0", team.canDeliverQuality());
+    }
+
+    @Test
+    public void teamCanNotDeliverQualityWithDevZeroVelocity() {
+            /* - team can not deliver stories if dev's velocity = 0 and tester's not
+               - team = dev1 + dev2 + test1 + test2
+               - story1(Dev/Test) = 6/3
+               - story2(dev/Test) = 1/1
+               - story3(dev/test) = 6/2
+               - story4(dev/test) = 1/1
+             */
+        Team team = new Team();
+
+        // Set sprint days
+        team.sprintDays = 10;
+
+        // Add Team members and add velocity
+        Member developerOne = new Member(DEV);
+        team.addMember(developerOne);
+        developerOne.velocity = 0;
+
+        Member developerTwo = new Member(DEV);
+        team.addMember(developerOne);
+        developerTwo.velocity = 0;
+
+        Member testerOne = new Member(TEST);
+        team.addMember(testerOne);
+        testerOne.velocity = 1;
+
+        Member testerTwo = new Member(TEST);
+        team.addMember(testerTwo);
+        testerTwo.velocity = 0.5;
+
+        // set story points for Devs and Testers. Put stories into sprint backlog
+        Story storyOne = new Story();
+        storyOne.setStoryPoints(6);
+        storyOne.setTestPoints(3);
+
+        Story storyTwo = new Story();
+        storyTwo.setStoryPoints(1);
+        storyTwo.setTestPoints(1);
+
+        Story storyThree = new Story();
+        storyThree.setStoryPoints(6);
+        storyThree.setTestPoints(2);
+
+        Story storyFour = new Story();
+        storyFour.setStoryPoints(1);
+        storyFour.setTestPoints(1);
+
+        team.backlog = Arrays.asList(storyOne, storyTwo);
+        Assert.assertFalse("Team can deliver all stories in time with two developers velocity=0", team.canDeliverQuality());
+    }
+
     /**
-     * Black-box testing:
+     * White-box testing:
      * - Happy Path: Can deliver stories If testing team velocity > all stories points sum
      * - Negative Case: Can't deliver stories if testing team velocity < all stories points sum
      * - Border Case: Can deliver stories if testing team velocity = all stories points sum

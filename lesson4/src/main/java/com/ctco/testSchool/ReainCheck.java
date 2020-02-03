@@ -10,7 +10,7 @@ public class ReainCheck {
 
     class FirstTask {
         public static String concatenate(int first, int second, String third) {
-            return ++first + second + third;
+            return ++first + third + second;               // ++first means +1. E.g.: 6+1
         }
     }
 
@@ -35,7 +35,7 @@ class ThirdTask {
     class FourthTask {
         public double a;
         public double b;
-        public FourthTask(int a, int b) {
+        public FourthTask(int a, int b) {  // eto konstruktor kotorij sozdajot objekti.
             this.a = a;
             this.b = b;
         }
@@ -55,7 +55,7 @@ class ThirdTask {
     class SixthTask {
         public static String isNumberPositive(int number) {
             while(number>0) {
-                return "positive";
+                return "positive";  // esli ubratj etot return to proga zaciklitsja. While tut po suti rabotajet kak IF
             } return "negative";
         }
     }
