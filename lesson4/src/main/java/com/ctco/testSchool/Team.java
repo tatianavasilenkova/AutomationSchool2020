@@ -1,7 +1,10 @@
 package com.ctco.testSchool;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sun.org.glassfish.external.probe.provider.annotations.ProbeListener;
 
 public class Team {
     private List<Member> members = new ArrayList<>();
@@ -35,6 +38,14 @@ public class Team {
      */
 
     public boolean canDeliverQuality() {
+      //  validateInputs();
+        for (Story story:backlog
+        ) { if ((story.storyPoints+story.testPoints)>sprintDays) return false;
+        }
+        return  (canDeliver() && canTest());
+    }
+
+    private boolean canTest() {
         return members.stream()
                 .filter(item -> item.testingSkills)
                 .mapToDouble(i->i.velocity*sprintDays)
@@ -51,4 +62,39 @@ public class Team {
                 .mapToDouble(i->i.velocity*sprintDays)
                 .sum() >=  backlog.stream().mapToDouble(s->s.storyPoints).sum();
     }
+
+    /*
+        Throws exception if invalid input, such as zero sprint days or any member velicity (also if velocity>1)
+     */
+    private void validateInputs() {
+        if (sprintDays<2) throw new IllegalArgumentException("Sprint should be at least two days long");
+        members.stream()
+                .filter(item -> item.velocity<=0)
+                .findAny()
+                .ifPresent(a -> { throw new IllegalArgumentException("Velocity should be positive"); });
+        members.stream()
+                .filter(item -> item.velocity>1)
+                .findAny()
+                .ifPresent(a -> { throw new IllegalArgumentException("Velocity can't be more than 1"); });
+    }
+
+
+    /*
+    for input n returns closes prime number (prime numbers are 2,3,5,7,11,13,17,19,23,... these not dividable by anything except 1 and themselves)
+     */
+    public static int getPrimeNumberClosesTo(int n) {
+        for(int c=0,s=0,d,N=n;c!=2;s++)for(c=d=1,n+=n<N?s:-s;d<n;)if(n%++d<1)c++;return n;
+    }
+
+
+    public static String getHelloWorldText() {
+        int hours = LocalDateTime.now().getHour();
+        switch (hours) {
+            case 8: case 9: case 10: case 11: return "Good morning world!";
+            case 12: case 13: case 14: case 15: case 16: return "Good day world!";
+            case 17: return "Hello world!";
+            default: return "Good night world!";
+        }
+    }
+
 }

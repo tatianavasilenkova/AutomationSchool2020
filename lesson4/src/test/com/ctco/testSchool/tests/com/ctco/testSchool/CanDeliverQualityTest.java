@@ -2,7 +2,10 @@ package com.ctco.testSchool;
 
 import static com.ctco.testSchool.Member.type.DEV;
 import static com.ctco.testSchool.Member.type.TEST;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -11,10 +14,129 @@ import org.junit.Test;
 public class CanDeliverQualityTest {
 
     /**
+     * Try-catch loop:
+     *  1. test_SprintDaysNotSet_canDeliverQuality()
+     *  2. test_MemberVelocityIsMoreThanOne_canDeliverQuality()
+     *  3. test_MemberVelocityPositiveness_canDeliverQuality()
+     *  4. test_CanNotDeliver_canDeliverQuality()
+     */
+    @Test
+    public void test_SprintDaysNotSet_canDeliverQuality() { //If BA forgot to set sprint days
+        Team team = new Team();
+        team.sprintDays = 0;
+
+        Story story = new Story();
+        story.setStoryPoints(2);
+        story.setTestPoints(1);
+
+        // Creating & setting Sprint backlog
+        team.backlog = new ArrayList<>();
+        team.backlog.add(story);
+
+        try {
+            assertEquals( false, team.canDeliverQuality(), "Team  could deliver when they should not");
+            fail("Check sprint is more that 2 days test fails");
+
+        } catch (IllegalArgumentException e) {
+            assertEquals("Sprint should be at least two days long", e.getMessage(), "Exception not caught");
+        }
+    }
+
+
+    @Test
+    public void test_MemberVelocityIsMoreThanOne_canDeliverQuality() { // If one of team members has velocity set > 1
+        Team team = new Team();
+        team.sprintDays = 10;
+
+        Member devOne = new Member(DEV);   // set Dev velocity 0.5
+        team.addMember(devOne);
+        devOne.velocity = 0.5;
+
+        Member qaOne = new Member(TEST);   // set QA velocity 1.5
+        team.addMember(qaOne);
+        qaOne.velocity = 1.5;
+
+        Story story = new Story();
+        story.setStoryPoints(5);
+        story.setTestPoints(5);
+
+        team.backlog = new ArrayList<>(); //creating list of backlog and adding there a story
+        team.backlog.add(story);
+
+        try {
+            assertEquals(true, team.canDeliverQuality(), "Team  could deliver when they should not");   // test should have been failed, but passed instead
+
+        } catch (IllegalArgumentException e) {
+            assertEquals("Team member velocity should be less than 1 but more than 0", e.getMessage(), "Exception not caught");
+        }
+    }
+
+
+    @Test
+    public void test_MemberVelocityPositiveness_canDeliverQuality() { // If one of team members has velocity set > 0 (meaning, he's not available OR got sick)
+        Team team = new Team();
+        team.sprintDays = 10;
+
+        Member devOne = new Member(DEV);   // set Dev velocity 0.5
+        team.addMember(devOne);
+        devOne.velocity = 0.5;
+
+        Member qaOne = new Member(TEST);   // set QA velocity 1.5
+        team.addMember(qaOne);
+        qaOne.velocity = 0;
+
+        Story story = new Story();
+        story.setStoryPoints(5);
+        story.setTestPoints(5);
+
+        team.backlog = new ArrayList<>(); //creating list of backlog and adding there a story
+        team.backlog.add(story);
+
+        try {
+            assertEquals(true, team.canDeliverQuality(), "Team  could deliver when they should not");
+            fail("team member velocity should be positive, team member got sick OR run out of time");
+
+        } catch (IllegalArgumentException e) {
+            assertEquals("Team member velocity should be less than 1 but more than 0", e.getMessage(), "Exception not caught");
+        }
+    }
+
+
+    @Test
+    public void test_CanNotDeliver_canDeliverQuality() { // If two stories have per 5 points for each team member, then test expected to be failed
+        Team team = new Team();
+        team.sprintDays = 10;
+
+        Member devOne = new Member(DEV);   // set Dev velocity 0.5
+        team.addMember(devOne);
+        devOne.velocity = 1;
+
+        Member qaOne = new Member(TEST);   // set QA velocity 1.5
+        team.addMember(qaOne);
+        qaOne.velocity = 1;
+
+        Story storyOne = new Story();
+        storyOne.setStoryPoints(5);
+        storyOne.setTestPoints(5);
+
+        Story storyTwo = new Story();
+        storyTwo.setStoryPoints(5);
+        storyTwo.setTestPoints(5);
+
+        team.backlog = Arrays.asList(storyOne, storyTwo);
+        assertEquals(false, team.canDeliverQuality(), "Team can deliver when they should not with two equal stories");
+    }
+
+
+
+
+    /**
      * Black-box tests:
      * - Happy Path: team can deliver stories. 1 tester and 2 devs work in parallel, which give tester a time to finish testing in time;
      * - Negative case: team can not deliver stories. with one tester in team and 2 devs work in parallel;
      * - Happy Path: team can deliver same stories from previous test but with two testers in team and 2 devs work in parallel. It's a border case
+     * - Negative Path: team can not deliver stories if testers velocity = 0 and dev's not
+     * - Negative Path: team can not deliver stories if dev's velocity = 0 and tester's not
      */
 
     @Test
@@ -99,8 +221,8 @@ public class CanDeliverQualityTest {
         storyFour.setStoryPoints(1);
         storyFour.setTestPoints(1);
 
-        team.backlog = Arrays.asList(storyOne, storyTwo);
-        Assert.assertFalse("Team can't deliver all stories in time with one tester", team.canDeliverQuality());
+        team.backlog = Arrays.asList(storyTwo, storyOne);
+        Assert.assertTrue("Team can't deliver all stories in time with one tester", team.canDeliverQuality());
     }
 
     @Test
@@ -153,6 +275,21 @@ public class CanDeliverQualityTest {
 
         team.backlog = Arrays.asList(storyOne, storyTwo);
         Assert.assertTrue("Team can deliver all stories in time with two testers", team.canDeliverQuality());
+    }
+
+    @Test
+    public void zeroSprintDaysWithExeption() { //.. Ask for code
+        Team team = new Team();
+        team.backlog = new ArrayList<>();
+        // Set sprint days
+        team.sprintDays = 0;
+        try {
+            team.canDeliverQuality();
+            Assert.fail("Exception not thrown");
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("Sprint should be at least two days long", e.getMessage());
+           // System.out.println(e);
+        }
     }
 
     @Test
