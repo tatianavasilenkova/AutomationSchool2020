@@ -22,4 +22,11 @@ public class Story {
     public void setTestPoints(int testPoints) {
         this.testPoints = testPoints;
     }
+
+public Story(int storyPoints, int test){
+        this.storyPoints = storyPoints; // eto obra6enije ne k parametru a peremennoj klassa
+        testPoints = test;
+}
+
+
 }
