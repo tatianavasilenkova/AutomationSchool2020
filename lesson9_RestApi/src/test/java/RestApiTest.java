@@ -193,8 +193,7 @@ public class RestApiTest {
     /**
      * HomeWork:
      * 1. Get "List <Resources>" request and assertThat:
-     * 1) total_pages >= 2
-     * 2) Exactly one item exist with "name": "true red"    ????
+     * - total_pages >= 2
      */
     @Test
     public void listResourcesTotalPagesTest() {
@@ -208,8 +207,33 @@ public class RestApiTest {
                 .as(ResourcesPage.class);
 
         assertThat(resourcesPage.getTotal_pages()).isGreaterThanOrEqualTo(2);
-     }
+        }
 
+
+  /** HomeWork:
+            * 1. Get "List <Resources>" request and assertThat:
+            * - Exactly one item exist with "name": "true red"    ????
+            */
+    @Test
+    public void listResourcesNamesCountTest() {
+        ResourcesPage resourcesPage = given()
+                .spec(spec2)
+                .when()
+                .get("/unknown")
+                .then()
+                .statusCode(200)
+                .extract()
+                .as(ResourcesPage.class);
+
+        int count = 0;
+        for (int i = 0; i < resourcesPage.getData().length; i++) {
+            String name = resourcesPage.getData()[i].getName();
+            if (name.equals("true red")) {
+                count++;
+            }
+        }
+            assertEquals(1, count, "No such name or more items with such name exists");
+        }
 
     /**
      * HomeWork:
